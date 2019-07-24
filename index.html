@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background-color: skyblue;
+            color: red;
+        }
+        #canvas{
+            margin: 80px auto;
+            display: none;
+            box-shadow: 0 0 6px rgba(0,0,0,.5);
+        }
+        h1{
+            text-align: center; 
+            height: 50px;
+            line-height: 50px;
+        }
+        .btn{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            border-radius: 10px;
+            background-color: #fff;
+            color: blue;
+            font-size: 24px;
+            box-shadow: 0 0 30px rgba(0,0,0,.6);
+            margin-left: -100px;
+            margin-right: -100px;
+            cursor: pointer;
+        }
+        #timer{
+            font-weight: 800;
+            color:black;
+        }
+    </style>
+    <script src="./tool.js"></script>
+    <script src="./Tank.js"></script>
+    <script src='./bullet.js'></script>
+    <script src='./myHero.js'></script>
+    <script src='./enemyTank.js'></script>
+    <script src='./wall.js'></script>
+</head>
+<body>
+    <h1>真.坦克大战!是男人就坚持30s</h1>
+    <div class="btn">开始游戏</div>
+    <p id="timer">你坚持了     <span>00</span>分   <span>00</span>秒</p>
+    <canvas id="canvas" width="1200" height="800" ></canvas>
+    <script>
+        var btn = document.getElementsByClassName("btn")[0];
+        var h1 = document.getElementsByTagName("h1")[0];
+        var timer = document.querySelectorAll("#timer span");
+        btn.addEventListener("click",function(){
+            h1.style.display = "none";
+            this.style.display = "none";
+            canvas.style.display = "block";
+            start();
+            timerupdate()();
+        })
+        
+    </script>
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var x = canvas.width/2-15;
+        var y = canvas.height-80;
+
+        var enemyList = [];
+        var residual_bullet_list = [];  //这个数组用于记录被摧毁后的坦克的剩余子弹
+        var wallList = [];
+
+
+
+        var wall = new Wall(100,100);
+
+        addEventListener("keydown",function(e){
+            ss.keydownhandle(e);
+        })
+        var ss = new myHero(x,y,'#ff9900','#FFFF00');
+        // var enemy = new enemyTank(100,200,'blue');
+        var game = null;
+        for(var i = 0; i < 40; i++){
+            enemyList.push(new enemyTank(1+Math.random()*1000,1+Math.random()*600,'blue'))
+        }
+
+        function start(){
+            // x++;
+            // y++;
+            ctx.save();
+            ctx.fillStyle = "black";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            for(var i = 0; i < enemyList.length ;i++){
+                enemyList[i].update();
+            }
+            // enemy.update();
+            
+            residual_bullet_list.map(function(item,key){
+                item.update();
+            })
+            wall.update();
+            timerupdate();
+            ctx.restore();
+
+            game =  requestAnimationFrame(start)
+            isalive();
+        }
+        // document.onclick= function(){
+        //     cancelAnimationFrame(game)
+        // }
+
+        function isalive() {
+            ss.isalive?ss.update():window.cancelAnimationFrame(game);
+        }
+        function timerupdate(){
+            var startSeconds = 0;
+            var startMinutes = 0;
+            return function(){
+                clock = setInterval(function(){
+                    startSeconds ++
+                    timer[0].innerHTML = startMinutes;
+                    timer[1].innerHTML = startSeconds;
+                    if( startSeconds == 60 ){
+                        startMinutes ++;
+                        timer[0].innerHTML = startMinutes;
+                    }
+                    !ss.isalive && clearInterval(clock);
+                    
+                },1000)
+                
+            }
+        }
+
+
+
+        // start()
+    </script>
+</body>
+</html>
